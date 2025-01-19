@@ -1,0 +1,30 @@
+GET http://localhost:3000/api/books HTTP/1.1
+
+###
+
+GET http://localhost:3000/api/members HTTP/1.1
+
+###
+POST http://localhost:3000/api/members/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "fname": "Mattias",
+  "lname": "Efternamn",
+  "address": "Min gata 13",
+  "city": "Bandhagen",
+  "zip": 12472,
+  "phone": "07394629865",
+  "email": "mu222cu@student.lnu.se",
+  "password": "mattiassecurepassword"
+}
+
+###
+
+DELETE http://localhost:3000/api/cart HTTP/1.1
+Content-Type: application/json
+
+{
+  "userid": 2,
+  "isbn": "1234567890"
+}
