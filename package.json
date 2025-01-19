@@ -2,10 +2,12 @@
   "name": "assignment2-backend",
   "version": "1.0.0",
   "main": "app.js",
+  "type": "module",
   "scripts": {
-    "lint": "npx eslint .",
-    "lint:fix": "npx eslint --fix .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "start": "node src/app.js",
+  "lint": "npx eslint .",
+  "lint:fix": "npx eslint --fix .",
+  "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Mattias Ubbesen <mu222cu@student.lnu.se>",
