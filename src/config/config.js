@@ -8,3 +8,7 @@ export const dbConfig = {
   password: process.env.DB_PASSWORD || 'password',
   database: process.env.DB_NAME || 'book_store',
 }
+
+export const serverConfig = {
+  port: process.env.PORT || 3000,
+}

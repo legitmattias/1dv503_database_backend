@@ -1,4 +1,4 @@
-// src/router/index.js
+// src/routes/index.js
 import express from 'express'
 import booksRouter from './books.js'
 import membersRouter from './members.js'
