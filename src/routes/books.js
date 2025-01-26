@@ -1,6 +1,7 @@
 // src/routes/books.js
 import express from 'express'
 import db from '../config/db.js'
+import { validateSession } from '../middleware/auth.js'
 
 const router = express.Router()
 
