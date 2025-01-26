@@ -68,6 +68,13 @@ router.post('/login', async (req, res) => {
     // Store the session token in the in-memory sessions object.
     sessions[sessionToken] = user.userid
 
+    // Set the session token as an HttpOnly cookie.
+    res.cookie('sessionToken', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+    })
+
     res.json({
       message: 'Login successful',
       sessionToken,
