@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
     let query = 'SELECT * FROM members'
     const params = []
 
-    // Filter by email if provided
+    // Filter by email if provided.
     if (email) {
       query += ' WHERE email = ?'
       params.push(email)
@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
   }
 })
 
-// Register a new member
+// Register a new member.
 router.post('/register', async (req, res) => {
   const { fname, lname, address, city, zip, phone, email, password } = req.body
   try {
@@ -45,7 +45,7 @@ router.post('/register', async (req, res) => {
   }
 })
 
-// Login a member
+// Login the user.
 router.post('/login', async (req, res) => {
   const { email, password } = req.body
   try {
@@ -76,6 +76,19 @@ router.post('/login', async (req, res) => {
     console.error(err)
     res.status(500).json({ error: 'Failed to log in' })
   }
+})
+
+// Logout the user.
+router.post('/logout', validateSession, (req, res) => {
+  const { sessionToken } = req.cookies || req.headers.authorization
+
+  if (sessionToken) {
+    delete sessions[sessionToken] // Remove the session from in-memory storage.
+    res.clearCookie('sessionToken') // Clear the session cookie.
+    return res.json({ message: 'Logout successful' })
+  }
+
+  res.status(400).json({ error: 'No session token provided' })
 })
 
 export default router
