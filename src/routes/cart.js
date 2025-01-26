@@ -5,7 +5,7 @@ import { validateSession } from '../middleware/auth.js'
 
 const router = express.Router()
 
-// Apply middleware to all routes in this router
+// Validate session cookie for all routes.
 router.use(validateSession)
 
 // Add a book to the cart.

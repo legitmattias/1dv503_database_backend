@@ -4,6 +4,9 @@ import db from '../config/db.js'
 
 const router = express.Router()
 
+// Validate session cookie for all routes.
+router.use(validateSession)
+
 // Get all books
 router.get('/', async (req, res) => {
   try {
