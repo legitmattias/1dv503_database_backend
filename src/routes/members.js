@@ -1,6 +1,7 @@
 // src/routes/members.js
 import express from 'express'
 import db from '../config/db.js'
+import { validateSession, sessions } from '../middleware/auth.js'
 
 const router = express.Router()
 
@@ -62,6 +63,11 @@ router.post('/login', async (req, res) => {
 
     // Simulated session token. Not for production.
     const sessionToken = `${user.userid}-${Date.now()}`
+
+
+    // Store the session token in the in-memory sessions object.
+    sessions[sessionToken] = user.userid
+
     res.json({
       message: 'Login successful',
       sessionToken,
@@ -80,7 +86,7 @@ router.post('/login', async (req, res) => {
 
 // Logout the user.
 router.post('/logout', validateSession, (req, res) => {
-  const { sessionToken } = req.cookies || req.headers.authorization
+  const sessionToken = req.cookies?.sessionToken || req.headers.authorization
 
   if (sessionToken) {
     delete sessions[sessionToken] // Remove the session from in-memory storage.
