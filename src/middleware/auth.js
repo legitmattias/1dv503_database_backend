@@ -9,5 +9,7 @@ export const validateSession = (req, res, next) => {
 
   // Attach the user ID from the session to the request object.
   req.userid = sessions[sessionToken]
+  console.log('Session cookie validated. User authorized.')
+  
   next()
 }
