@@ -45,4 +45,37 @@ router.post('/register', async (req, res) => {
   }
 })
 
+// Login a member
+router.post('/login', async (req, res) => {
+  const { email, password } = req.body
+  try {
+    const [users] = await db.query(
+      'SELECT * FROM members WHERE email = ? AND password = ?',
+      [email, password],
+    )
+
+    if (users.length === 0) {
+      return res.status(401).json({ error: 'Invalid email or password' })
+    }
+
+    const user = users[0]
+
+    // Simulated session token. Not for production.
+    const sessionToken = `${user.userid}-${Date.now()}`
+    res.json({
+      message: 'Login successful',
+      sessionToken,
+      user: {
+        userid: user.userid,
+        fname: user.fname,
+        lname: user.lname,
+        email: user.email,
+      },
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Failed to log in' })
+  }
+})
+
 export default router
