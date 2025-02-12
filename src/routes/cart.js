@@ -8,22 +8,24 @@ const router = express.Router()
 router.use(validateSession)
 
 // GET: Retrieve all items in the logged-in user’s cart.
+// GET: Retrieve all items in the logged-in user’s cart.
 router.get('/', async (req, res) => {
   try {
     const [cartItems] = await db.query(
-      `SELECT c.isbn, c.qty, b.title, b.price, (c.qty * b.price) AS total
+      `SELECT c.isbn, c.qty, b.title, b.author, b.price, (c.qty * b.price) AS total
        FROM cart c
        JOIN books b ON c.isbn = b.isbn
        WHERE c.userid = ?`,
       [req.userid],
     )
-    console.log(`Retrieving cart with items: ${cartItems}`)
+    console.log('Retrieving cart with items:', cartItems)
     res.json(cartItems)
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to fetch cart items' })
   }
 })
+
 
 // POST: Add a book to the cart.
 router.post('/', async (req, res) => {
