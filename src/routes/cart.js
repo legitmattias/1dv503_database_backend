@@ -18,6 +18,7 @@ router.get('/', async (req, res) => {
        WHERE c.userid = ?`,
       [req.userid],
     )
+    console.log(`Retrieving cart with items: ${cartItems}`)
     res.json(cartItems)
   } catch (err) {
     console.error(err)
@@ -34,6 +35,7 @@ router.post('/', async (req, res) => {
        VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE qty = qty + ?`,
       [req.userid, isbn, qty, qty],
     )
+    console.log(`Book added to cart: ${isbn} - Quantity: ${qty}`)
     res.json({ message: 'Book added to cart' })
   } catch (err) {
     console.error(err)
