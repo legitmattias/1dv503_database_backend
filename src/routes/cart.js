@@ -1,4 +1,3 @@
-// src/routes/cart.js
 import express from 'express'
 import db from '../config/db.js'
 import { validateSession } from '../middleware/auth.js'
@@ -8,7 +7,7 @@ const router = express.Router()
 // Validate session cookie for all routes.
 router.use(validateSession)
 
-// Get all items in the logged-in user’s cart.
+// GET: Retrieve all items in the logged-in user’s cart.
 router.get('/', async (req, res) => {
   try {
     const [cartItems] = await db.query(
@@ -26,7 +25,7 @@ router.get('/', async (req, res) => {
   }
 })
 
-// Add a book to the cart.
+// POST: Add a book to the cart.
 router.post('/', async (req, res) => {
   const { isbn, qty } = req.body
   try {
@@ -40,6 +39,27 @@ router.post('/', async (req, res) => {
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to add to cart' })
+  }
+})
+
+//  DELETE: Remove a book from the cart
+router.delete('/', async (req, res) => {
+  const { isbn } = req.body
+  try {
+    const [result] = await db.query(
+      'DELETE FROM cart WHERE userid = ? AND isbn = ?',
+      [req.userid, isbn],
+    )
+
+    if (result.affectedRows > 0) {
+      console.log(`Removed book from cart: ${isbn}`)
+      res.json({ message: 'Book removed from cart' })
+    } else {
+      res.status(404).json({ error: 'Book not found in cart' })
+    }
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Failed to remove book from cart' })
   }
 })
 
