@@ -8,12 +8,24 @@ const router = express.Router()
 // Validate session for all routes
 router.use(validateSession)
 
-// Checkout and create an order.
+// POST: Checkout and create an order.
 router.post('/checkout', async (req, res) => {
   const { userid } = req
-  const { shipAddress = 'Default Address', shipCity = 'Default City', shipZip = '00000' } = req.body
 
   try {
+    // Retrieve user's shipping details.
+    const [userData] = await db.query(
+      `SELECT address AS shipAddress, city AS shipCity, zip AS shipZip 
+       FROM members WHERE userid = ?`,
+      [userid],
+    )
+
+    if (userData.length === 0) {
+      return res.status(400).json({ error: 'User not found' })
+    }
+
+    const { shipAddress, shipCity, shipZip } = userData[0]
+
     // Retrieve cart items.
     const [cartItems] = await db.query(
       `SELECT c.isbn, c.qty, b.title, b.price, (c.qty * b.price) AS total
@@ -63,5 +75,56 @@ router.post('/checkout', async (req, res) => {
     res.status(500).json({ error: 'Failed to checkout' })
   }
 })
+
+// GET: Retrieve order confirmation details by order ID
+router.get('/confirmation/:orderId', async (req, res) => {
+  const { orderId } = req.params
+
+  try {
+    // Retrieve shipping address and order details
+    const [orderDetails] = await db.query(
+      `SELECT o.ono AS orderId, o.created, 
+              m.fname, m.lname, m.address, m.city, m.zip, 
+              od.isbn, b.title, b.price, od.qty, 
+              (od.qty * b.price) AS total
+       FROM orders o
+       JOIN members m ON o.userid = m.userid
+       JOIN odetails od ON o.ono = od.ono
+       JOIN books b ON od.isbn = b.isbn
+       WHERE o.ono = ? AND o.userid = ?`,
+      [orderId, req.userid],
+    )
+
+    if (orderDetails.length === 0) {
+      return res.status(404).json({ error: 'Order not found or does not belong to user' })
+    }
+
+    // Format response
+    const response = {
+      orderId: orderDetails[0].orderId,
+      created: orderDetails[0].created,
+      shippingAddress: {
+        name: `${orderDetails[0].fname} ${orderDetails[0].lname}`,
+        address: orderDetails[0].address,
+        city: orderDetails[0].city,
+        zip: orderDetails[0].zip,
+      },
+      items: orderDetails.map(item => ({
+        isbn: item.isbn,
+        title: item.title,
+        price: item.price,
+        qty: item.qty,
+        total: item.total,
+      })),
+      totalAmount: orderDetails.reduce((sum, item) => sum + item.total, 0),
+    }
+
+    res.json(response)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ error: 'Failed to retrieve order confirmation' })
+  }
+})
+
 
 export default router
