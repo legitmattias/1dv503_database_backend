@@ -76,6 +76,29 @@ router.post('/checkout', async (req, res) => {
   }
 })
 
+// GET: Retrieve all past orders for the logged-in user.
+router.get('/', async (req, res) => {
+  try {
+    const [orders] = await db.query(
+      `SELECT o.ono, o.created, o.shipAddress, o.shipCity, o.shipZip, 
+              SUM(d.amount) AS totalAmount, COUNT(d.isbn) AS totalItems
+       FROM orders o
+       JOIN odetails d ON o.ono = d.ono
+       WHERE o.userid = ?
+       GROUP BY o.ono
+       ORDER BY o.created DESC`,
+      [req.userid],
+    )
+    console.log('Fetching orders')
+    
+    res.json(orders)
+  } catch (err) {
+    console.log(`Failed to fetch orders: ${err}`)
+    res.status(500).json({ error: 'Failed to fetch order history' })
+  }
+})
+
+
 // GET: Retrieve order confirmation details by order ID
 router.get('/confirmation/:orderId', async (req, res) => {
   const { orderId } = req.params
