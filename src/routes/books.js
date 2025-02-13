@@ -73,9 +73,9 @@ router.get('/subject', async (req, res) => {
   }
 })
 
-// Search books by author or title.
+// Search books by author or title with pagination
 router.get('/search', async (req, res) => {
-  const { author, title } = req.query
+  const { author, title, page = 1, limit = 3 } = req.query
 
   if (!author && !title) {
     return res.status(400).json({ error: 'Either author or title must be provided' })
@@ -87,12 +87,28 @@ router.get('/search', async (req, res) => {
 
   try {
     const query = author
-      ? 'SELECT * FROM books WHERE author LIKE ?'
-      : 'SELECT * FROM books WHERE title LIKE ?'
-    const param = author ? `%${author}%` : `%${title}%`
+      ? 'SELECT * FROM books WHERE author LIKE ? LIMIT ? OFFSET ?'
+      : 'SELECT * FROM books WHERE title LIKE ? LIMIT ? OFFSET ?'
 
-    const [books] = await db.query(query, [param])
-    res.json(books)
+    const param = author ? `%${author}%` : `%${title}%`
+    const offset = (page - 1) * limit
+
+    // Get paginated books
+    const [books] = await db.query(query, [param, parseInt(limit), parseInt(offset)])
+
+    // Get total book count for pagination
+    const countQuery = author
+      ? 'SELECT COUNT(*) as total FROM books WHERE author LIKE ?'
+      : 'SELECT COUNT(*) as total FROM books WHERE title LIKE ?'
+      
+    const [[{ total }]] = await db.query(countQuery, [param])
+
+    res.json({
+      books,
+      total,
+      page: parseInt(page),
+      totalPages: Math.ceil(total / limit),
+    })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to search books' })
