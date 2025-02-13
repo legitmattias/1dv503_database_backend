@@ -28,10 +28,12 @@ The API will be available at **`http://localhost:3000/api`**.
 ## 📌 Endpoints Overview
 - `GET /api/books` → Retrieve all books (paginated)
 - `GET /api/books/search?title=...` → Search by title (paginated)
+- `GET /api/books/search?author=...` → Search by author (paginated)
 - `GET /api/books/subject` → Browse by subject (paginated)
 - `POST /api/members/register` → Register a user
 - `POST /api/members/login` → Login and get a session
 - `POST /api/cart` → Add books to cart
 - `POST /api/orders/checkout` → Place an order
+- `GET /api/orders/confirmation/:orderId` → Order confirmation page
 
 ---
