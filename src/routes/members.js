@@ -5,8 +5,8 @@ import { validateSession, sessions } from '../middleware/auth.js'
 
 const router = express.Router()
 
-// Get members (all or filtered by email)
-router.get('/', async (req, res) => {
+// Get members (all or filtered by email) (FOR DEV USES ONLY)
+/* router.get('/', async (req, res) => {
   const { email } = req.query
   try {
     let query = 'SELECT * FROM members'
@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
     console.error(err)
     res.status(500).json({ error: 'Failed to fetch members' })
   }
-})
+}) */
 
 // Register a new member.
 router.post('/register', async (req, res) => {
